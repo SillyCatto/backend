@@ -3,6 +3,18 @@ const express = require('express');
 const port = 3000;
 const app = express();
 
+// testing dummy authorization
+app.get('/admin/:token', (req, res) => {
+    const token = req.params.token;
+    const isAuthorized = token === 'xyz';
+
+    if (isAuthorized) {
+        res.send('All data sent');
+    } else {
+        res.status(401).send('Not Allowed');
+    }
+})
+
 app.get('/user', (req, res) => {
     const data = {
         name: 'Bob',
