@@ -22,6 +22,11 @@ app.post('/user', (req, res) => {
 })
 
 // experimenting with route handlers
+app.use('/', (req, res, next) => {
+    // res.send('/ handler');
+    next();
+})
+
 app.use(
     '/test',
     (req, res, next) => {
@@ -36,7 +41,7 @@ app.use(
     },
     (req, res, next) => {
         console.log('3rd handler');
-        res.send('3rd handler');
+        res.send('3rd /user handler');
     }
 );
 
