@@ -3,16 +3,21 @@ const express = require('express');
 const port = 3000;
 const app = express();
 
-app.use('/hello', (req, res) => {
-    res.send('hello!');
+app.get('/user', (req, res) => {
+    const data = {
+        name: 'Cat',
+        age: 10
+    };
+    res.send(data);
 });
+
+app.post('/user', (req, res) => {
+    console.log('posted user data', req.query);
+    res.send('posted user data')
+})
 
 app.use('/test', (req, res) => {
-    res.send('test page');
-});
-
-app.use((req, res) => {
-    res.send('hello from the server');
+    res.send('test page\nAPI returned:\n');
 });
 
 app.listen(port, () => {
