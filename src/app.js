@@ -21,9 +21,24 @@ app.post('/user', (req, res) => {
     res.send('posted user data')
 })
 
-app.use('/test', (req, res) => {
-    res.send('test page');
-});
+// experimenting with route handlers
+app.use(
+    '/test',
+    (req, res, next) => {
+        console.log('1st handler');
+        // res.send('1st handler');
+        next();
+    },
+    (req, res, next) => {
+        console.log('2nd handler');
+        // res.send('2nd handler');
+        next();
+    },
+    (req, res, next) => {
+        console.log('3rd handler');
+        res.send('3rd handler');
+    }
+);
 
 app.listen(port, () => {
     console.log(`server running on port: ${port}`);
