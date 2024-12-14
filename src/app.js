@@ -1,23 +1,21 @@
 const express = require('express');
+const { adminAuth, userAuth } = require('./middlewares/auth');
 
 const port = 3000;
 const app = express();
 
 // testing dummy authorization
-app.use('/admin', (req, res, next) => {
-    // const token = 'abc';
-    const token = 'xyz';
-    const isAuthorized = token === 'xyz';
-    if (!isAuthorized){
-        res.status(401).send('Not Allowed');
-    } else {
-        next();
-    }
+app.use('/admin', adminAuth);
+
+app.get('/admin', (req, res) => {
+    res.send('Admin page');
 });
 
 app.get('/admin/getAllData', (req, res) => {
     res.send('All data sent');
 });
+
+app.use('/user', userAuth);
 
 app.get('/user', (req, res) => {
     const data = {
