@@ -28,6 +28,17 @@ app.get("/allUsers", async (req, res) => {
   }
 });
 
+app.delete("/deleteUserByName", async (req, res) => {
+  const username = req.body.name;
+
+  try {
+    const deletedUser = await User.findOneAndDelete({ name: username });
+    res.send("user deleted successfully");
+  } catch (err) {
+    res.status(400).send("something went wrong :(");
+  }
+});
+
 connectDB()
   .then(() => {
     console.log("Database connected successfully.");
