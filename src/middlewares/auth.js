@@ -1,3 +1,5 @@
+// these are just dummy auth for testing middlewares
+
 const adminAuth = (req, res, next) => {
     console.log('Authorizing Admin');
     const token = 'abc';
