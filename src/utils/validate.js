@@ -15,10 +15,12 @@ const validateSignupInput = (req) => {
 };
 
 const validateLoginInput = (email, password) => {
-  if (!isEmail(email)) {
-    throw new Error("Invalid email: " + email);
-  } else if (!password) {
-    throw new Error("Please enter your password to login");
+  if (!email || !isEmail(email)) {
+    throw new Error("Please enter a valid email address.");
+  }
+
+  if (!password) {
+    throw new Error("Password is required to log in.");
   }
 };
 
