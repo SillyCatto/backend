@@ -1,22 +1,40 @@
 const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "User name is required"],
+      trim: true,
+      minlength: [3, "User name must be at least 3 characters"],
+    },
+    emailID: {
+      type: String,
+      required: [true, "Email is required"],
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: [true, "Password is required"],
+      minlength: [6, "Password must be at least 6 characters"],
+    },
+    age: {
+      type: Number,
+      min: [18, "You must be at least 18 to signup"],
+      max: [100, "Please enter a valid age"],
+    },
+    gender: {
+      type: String,
+      enum: ["male", "female", "other"],
+      default: "other",
+    },
   },
-  emailID: {
-    type: String,
+  {
+    timestamps: true,
   },
-  password: {
-    type: String,
-  },
-  age: {
-    type: Number,
-  },
-  gender: {
-    type: String,
-  },
-});
+);
 
 const User = mongoose.model("User", userSchema);
 
