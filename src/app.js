@@ -1,6 +1,10 @@
 const express = require("express");
+
 const connectDB = require("./config/database");
 const User = require("./models/user");
+const { validateSignupInput, validateLoginInput } = require("./utils/validate");
+const { encryptPassword } = require("./utils/encryptor");
+const { authUser } = require("./utils/auth");
 
 const port = 3000;
 const app = express();
@@ -8,13 +12,34 @@ const app = express();
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
-  const user = new User(req.body);
-
   try {
+    validateSignupInput(req);
+
+    req.body.password = await encryptPassword(req.body.password);
+
+    const user = new User(req.body);
+
     await user.save();
-    res.send("user data added successfully");
+    res.send("user added successfully");
   } catch (err) {
-    res.status(400).send("error saving user data.\n" + err);
+    res.status(400).send("ERROR: " + err.message);
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    validateLoginInput(email, password);
+
+    const isLoginSuccessful = await authUser(email, password);
+
+    if (isLoginSuccessful) {
+      res.send("Login successful!");
+    } else {
+      throw new Error("Invalid credentials");
+    }
+  } catch (err) {
+    res.status(400).send("ERROR: " + err.message);
   }
 });
 
