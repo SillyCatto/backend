@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+
 const { generateToken } = require("../utils/jwt");
 
 const userSchema = new mongoose.Schema(
@@ -39,6 +41,15 @@ const userSchema = new mongoose.Schema(
 
 userSchema.methods.getJWT = async function () {
   return await generateToken(this._id);
+};
+
+userSchema.methods.checkPassword = async function (inputPassword) {
+  const user = this;
+  const passwordHash = user.password;
+
+  const isPasswordValid = await bcrypt.compare(inputPassword, passwordHash);
+
+  return isPasswordValid;
 };
 
 const User = mongoose.model("User", userSchema);

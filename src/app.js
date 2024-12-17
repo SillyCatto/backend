@@ -11,16 +11,20 @@ const { encryptPassword } = require("./utils/encryptor");
 const { authUser } = require("./middlewares/authLogin");
 const { authUserToken } = require("./middlewares/authToken");
 
+const {
+  jsonErrorHandler,
+  globalErrorHandler,
+} = require("./middlewares/errorHandler");
+
 const port = 3000;
 const app = express();
 
 app.use(express.json());
+app.use(jsonErrorHandler);
 app.use(cookieParser());
 
-app.post("/signup", async (req, res) => {
+app.post("/signup", validateSignupInput, async (req, res) => {
   try {
-    validateSignupInput(req);
-
     req.body.password = await encryptPassword(req.body.password);
 
     const user = new User(req.body);
@@ -35,7 +39,6 @@ app.post("/signup", async (req, res) => {
 app.post("/login", validateLoginInput, authUser, async (req, res) => {
   try {
     const user = req.body.user;
-
     const token = await user.getJWT();
     res.cookie("token", token);
     res.send("Login successful!");
@@ -71,6 +74,8 @@ app.delete("/deleteUserByName", async (req, res) => {
     res.status(400).send("something went wrong :(");
   }
 });
+
+app.use(globalErrorHandler);
 
 const run = () => {
   connectDB()

@@ -1,4 +1,3 @@
-const bcrypt = require("bcrypt");
 const User = require("../models/user");
 
 const authUser = async (req, res, next) => {
@@ -7,7 +6,7 @@ const authUser = async (req, res, next) => {
     const user = await User.findOne({ email: email });
     if (!user) throw new Error("Invalid credentials");
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await user.checkPassword(password);
     if (!isPasswordValid) throw new Error("Invalid credentials");
 
     req.body.user = user;
