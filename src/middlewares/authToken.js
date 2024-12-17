@@ -5,7 +5,7 @@ const authUserToken = async (req, res, next) => {
   try {
     const { token } = req.cookies;
     if (!token) {
-      return res.status(401).send("Please login first");
+      return res.status(401).json({ error: "Please login first" });
     }
 
     const { _id } = validateToken(token);
