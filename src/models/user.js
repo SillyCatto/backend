@@ -39,8 +39,8 @@ const userSchema = new mongoose.Schema(
   },
 );
 
-userSchema.methods.getJWT = async function () {
-  return await generateToken(this._id);
+userSchema.methods.getJWT = function () {
+  return generateToken(this._id);
 };
 
 userSchema.methods.checkPassword = async function (inputPassword) {

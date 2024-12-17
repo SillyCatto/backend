@@ -8,7 +8,7 @@ const authUserToken = async (req, res, next) => {
       return res.status(401).send("Please login first");
     }
 
-    const { _id } = await validateToken(token);
+    const { _id } = validateToken(token);
 
     const user = await User.findById(_id);
     if (!user) throw new Error("User not found");

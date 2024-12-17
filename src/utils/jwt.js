@@ -3,11 +3,11 @@ const jwt = require("jsonwebtoken");
 
 const key = process.env.JWT_KEY;
 
-const generateToken = async (payload) => {
+const generateToken = (payload) => {
   return jwt.sign({ _id: payload }, key);
 };
 
-const validateToken = async (token) => {
+const validateToken = (token) => {
   return jwt.verify(token, key);
 };
 
