@@ -6,10 +6,9 @@ const User = require("./models/user");
 const {
   validateSignupInput,
   validateLoginInput,
-} = require("./utils/validateInput");
+} = require("./middlewares/validateInput");
 const { encryptPassword } = require("./utils/encryptor");
-const { authUser } = require("./controller/authLogin");
-const { generateToken } = require("./utils/jwt");
+const { authUser } = require("./middlewares/authLogin");
 const { authUserToken } = require("./middlewares/authToken");
 
 const port = 3000;
@@ -33,20 +32,13 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-app.post("/login", async (req, res) => {
+app.post("/login", validateLoginInput, authUser, async (req, res) => {
   try {
-    const { email, password } = req.body;
-    validateLoginInput(email, password);
+    const user = req.body.user;
 
-    const user = await authUser(email, password);
-
-    if (user.isAuthorized) {
-      const token = await generateToken(user._id);
-      res.cookie("token", token);
-      res.send("Login successful!");
-    } else {
-      throw new Error("Invalid credentials");
-    }
+    const token = await user.getJWT();
+    res.cookie("token", token);
+    res.send("Login successful!");
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);
   }

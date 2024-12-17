@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { generateToken } = require("../utils/jwt");
 
 const userSchema = new mongoose.Schema(
   {
@@ -35,6 +36,10 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+userSchema.methods.getJWT = async function () {
+  return await generateToken(this._id);
+};
 
 const User = mongoose.model("User", userSchema);
 

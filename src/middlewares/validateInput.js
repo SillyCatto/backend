@@ -14,13 +14,19 @@ const validateSignupInput = (req) => {
   }
 };
 
-const validateLoginInput = (email, password) => {
-  if (!email || !isEmail(email)) {
-    throw new Error("Please enter a valid email address.");
-  }
+const validateLoginInput = (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !isEmail(email)) {
+      throw new Error("Please enter a valid email address.");
+    }
 
-  if (!password) {
-    throw new Error("Password is required to log in.");
+    if (!password) {
+      throw new Error("Password is required to log in.");
+    }
+    next();
+  } catch (err) {
+    res.status(400).send("ERROR: " + err.message);
   }
 };
 
