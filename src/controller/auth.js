@@ -4,11 +4,12 @@ const User = require("../models/user");
 const authUser = async (email, password) => {
   const user = await User.findOne({ email: email });
   if (!user) {
-    return false;
+    user.isAuthorized = false;
+    return user;
   }
 
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  return isPasswordValid;
+  user.isAuthorized = await bcrypt.compare(password, user.password);
+  return user;
 };
 
 module.exports = {

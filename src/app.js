@@ -9,6 +9,7 @@ const {
 } = require("./utils/validateInput");
 const { encryptPassword } = require("./utils/encryptor");
 const { authUser } = require("./controller/auth");
+const { generateToken, validateToken } = require("./utils/jwt");
 
 const port = 3000;
 const app = express();
@@ -36,10 +37,12 @@ app.post("/login", async (req, res) => {
     const { email, password } = req.body;
     validateLoginInput(email, password);
 
-    const isLoginSuccessful = await authUser(email, password);
+    const user = await authUser(email, password);
 
-    if (isLoginSuccessful) {
-      res.cookie("token", "saganigadik");
+    if (user.isAuthorized) {
+      const token = await generateToken(user._id);
+      console.log(token);
+      res.cookie("token", token);
       res.send("Login successful!");
     } else {
       throw new Error("Invalid credentials");
@@ -49,7 +52,24 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// get user by email
+app.get("/profile", async (req, res) => {
+  try {
+    const { token } = req.cookies;
+    if (!token) throw new Error("Invalid token");
+
+    const { _id } = await validateToken(token);
+    const user = await User.findById(_id);
+
+    if (user) {
+      res.send(user);
+    } else {
+      throw new Error("Please login first");
+    }
+  } catch (err) {
+    res.status(400).send("ERROR: " + err.message);
+  }
+});
+
 app.get("/allUsers", async (req, res) => {
   try {
     const users = await User.find({});
@@ -57,12 +77,6 @@ app.get("/allUsers", async (req, res) => {
   } catch (err) {
     res.status(400).send("something went wrong :(");
   }
-});
-
-app.get("/profile", (req, res) => {
-  const cookies = req.cookies;
-  console.log(cookies);
-  res.send("reading cookies");
 });
 
 app.delete("/deleteUserByName", async (req, res) => {
@@ -76,13 +90,17 @@ app.delete("/deleteUserByName", async (req, res) => {
   }
 });
 
-connectDB()
-  .then(() => {
-    console.log("Database connected successfully.");
-    app.listen(port, () => {
-      console.log(`server running on port: ${port}`);
+const run = () => {
+  connectDB()
+    .then(() => {
+      console.log("Database connected successfully.");
+      app.listen(port, () => {
+        console.log(`server running on port: ${port}`);
+      });
+    })
+    .catch((err) => {
+      console.error("Error connecting to database");
     });
-  })
-  .catch((err) => {
-    console.error("Error connecting to database");
-  });
+};
+
+module.exports = { run };
