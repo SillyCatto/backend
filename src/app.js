@@ -8,8 +8,9 @@ const {
   validateLoginInput,
 } = require("./utils/validateInput");
 const { encryptPassword } = require("./utils/encryptor");
-const { authUser } = require("./controller/auth");
-const { generateToken, validateToken } = require("./utils/jwt");
+const { authUser } = require("./controller/authLogin");
+const { generateToken } = require("./utils/jwt");
+const { authUserToken } = require("./middlewares/authToken");
 
 const port = 3000;
 const app = express();
@@ -41,7 +42,6 @@ app.post("/login", async (req, res) => {
 
     if (user.isAuthorized) {
       const token = await generateToken(user._id);
-      console.log(token);
       res.cookie("token", token);
       res.send("Login successful!");
     } else {
@@ -52,19 +52,9 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/profile", async (req, res) => {
+app.get("/profile", authUserToken, async (req, res) => {
   try {
-    const { token } = req.cookies;
-    if (!token) throw new Error("Invalid token");
-
-    const { _id } = await validateToken(token);
-    const user = await User.findById(_id);
-
-    if (user) {
-      res.send(user);
-    } else {
-      throw new Error("Please login first");
-    }
+    res.send(req.user);
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);
   }
