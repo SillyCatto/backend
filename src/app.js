@@ -6,6 +6,7 @@ const connectDB = require("./config/database");
 const {
   jsonErrorHandler,
   globalErrorHandler,
+  routeNotFound,
 } = require("./middlewares/errorHandler");
 
 const authRouter = require("./routes/authRouter");
@@ -19,8 +20,9 @@ app.use(jsonErrorHandler);
 app.use(cookieParser());
 
 app.use("/", authRouter);
-app.use("/", profileRouter);
+app.use("/profile", profileRouter);
 
+app.use(routeNotFound);
 app.use(globalErrorHandler);
 
 const run = () => {

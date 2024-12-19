@@ -18,7 +18,7 @@ authRouter.post("/signup", validateSignupInput, async (req, res) => {
     await user.save();
     res.send("user added successfully");
   } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
+    res.status(400).json({ error: err.message });
   }
 });
 
@@ -26,11 +26,18 @@ authRouter.post("/login", validateLoginInput, authUser, async (req, res) => {
   try {
     const user = req.body.user;
     const token = await user.getJWT();
-    res.cookie("token", token);
-    res.send("Login successful!");
+    res.cookie("token", token).send("Login successful!");
   } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
+    res.status(400).json({ error: err.message });
   }
+});
+
+authRouter.post("/logout", (req, res) => {
+  res
+    .cookie("token", null, {
+      expires: new Date(Date.now()),
+    })
+    .send("Logout successful");
 });
 
 module.exports = authRouter;

@@ -2,6 +2,14 @@ const { isEmail, isStrongPassword } = require("validator");
 
 const validateSignupInput = (req, res, next) => {
   try {
+    const allowedSignupFields = ["name", "email", "password", "age", "gender"];
+
+    const isSignupAllowed = Object.keys(req.body).every((field) => {
+      return allowedSignupFields.includes(field);
+    });
+
+    if (!isSignupAllowed) throw new Error("Invalid signup request");
+
     const { name, email, password } = req.body;
 
     if (!name || !email || !password)
@@ -18,7 +26,7 @@ const validateSignupInput = (req, res, next) => {
     }
     next();
   } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
+    res.status(400).json({ error: err.message });
   }
 };
 
@@ -34,8 +42,38 @@ const validateLoginInput = (req, res, next) => {
     }
     next();
   } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
+    res.status(400).json({ error: err.message });
   }
 };
 
-module.exports = { validateSignupInput, validateLoginInput };
+const validateProfileEditInput = (req, res, next) => {
+  try {
+    const allowedProfileEditFields = [
+      "name",
+      "email",
+      "age",
+      "gender",
+      "bio",
+      "photoURL",
+    ];
+
+    const isEditAllowed = Object.keys(req.body).every((field) => {
+      return allowedProfileEditFields.includes(field);
+    });
+
+    if (!isEditAllowed) throw new Error("Invalid profile edit request");
+
+    if (Object.hasOwn(req.body, "name") && !req.body.name)
+      throw new Error("Name cannot be empty");
+
+    next();
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+module.exports = {
+  validateSignupInput,
+  validateLoginInput,
+  validateProfileEditInput,
+};

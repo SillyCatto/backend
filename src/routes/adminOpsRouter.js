@@ -8,7 +8,7 @@ adminOpsRouter.get("/allUsers", async (req, res) => {
     const users = await User.find({});
     res.send(users);
   } catch (err) {
-    res.status(400).send("something went wrong :(");
+    res.status(400).json({ error: err.message });
   }
 });
 
@@ -19,7 +19,7 @@ adminOpsRouter.delete("/deleteUserByName", async (req, res) => {
     const deletedUser = await User.findOneAndDelete({ name: username });
     res.send("user deleted successfully");
   } catch (err) {
-    res.status(400).send("something went wrong :(");
+    res.status(400).json({ error: err.message });
   }
 });
 

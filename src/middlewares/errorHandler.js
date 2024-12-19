@@ -7,6 +7,13 @@ const jsonErrorHandler = (err, req, res, next) => {
   next(err);
 };
 
+const routeNotFound = (req, res, next) => {
+  res.status(404).json({
+    error: "Not Found",
+    message: `The requested URL ${req.method} ${req.originalUrl} was not found on this server.`,
+  });
+};
+
 // middleware to handle all unhandled errors
 const globalErrorHandler = (err, req, res, next) => {
   console.error(err.stack);
@@ -19,4 +26,5 @@ const globalErrorHandler = (err, req, res, next) => {
 module.exports = {
   jsonErrorHandler,
   globalErrorHandler,
+  routeNotFound,
 };
