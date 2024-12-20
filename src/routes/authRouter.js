@@ -2,7 +2,7 @@ const express = require("express");
 const {
   validateSignupInput,
   validateLoginInput,
-} = require("../middlewares/validateInput");
+} = require("../middlewares/validateAuthInput");
 const { encryptPassword } = require("../utils/encryptor");
 const User = require("../models/user");
 const { authUser } = require("../middlewares/authLogin");

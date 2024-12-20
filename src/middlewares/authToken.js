@@ -11,7 +11,7 @@ const authUserToken = async (req, res, next) => {
     const { _id } = validateToken(token);
 
     const user = await User.findById(_id);
-    if (!user) throw new Error("User not found");
+    if (!user) throw new Error("Invalid auth token");
 
     req.user = user;
     next();

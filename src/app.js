@@ -11,6 +11,7 @@ const {
 
 const authRouter = require("./routes/authRouter");
 const profileRouter = require("./routes/profileRouter");
+const requestRouter = require("./routes/requestRouter");
 
 const port = 3000;
 const app = express();
@@ -21,6 +22,7 @@ app.use(cookieParser());
 
 app.use("/", authRouter);
 app.use("/profile", profileRouter);
+app.use("/request", requestRouter);
 
 app.use(routeNotFound);
 app.use(globalErrorHandler);

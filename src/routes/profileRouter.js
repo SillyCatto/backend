@@ -1,12 +1,15 @@
 const express = require("express");
 const { authUserToken } = require("../middlewares/authToken");
-const { validateProfileEditInput } = require("../middlewares/validateInput");
+const {
+  validateProfileEditInput,
+} = require("../middlewares/validateProfileInput");
 
 const profileRouter = express.Router();
 
 profileRouter.get("/view", authUserToken, async (req, res) => {
   try {
     const viewOwnProfileData = {
+      userID: req.user._id,
       name: req.user.name,
       email: req.user.email,
       age: req.user.age,
