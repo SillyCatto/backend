@@ -10,9 +10,12 @@ const validateSendRequest = async (req, res, next) => {
     if (senderID.toString() === receiverID.toString())
       throw new Error("cannot send request to yourself");
 
-    // check if the receiver even exist in my user db
-    const receiverExist = await User.findById(receiverID);
-    if (!receiverExist) throw new Error("Invalid receiver ID");
+    // check if the receiver even exist in user db
+    const receiver = await User.findById(receiverID);
+    if (!receiver) throw new Error("Invalid receiver ID");
+
+    // if receiver exist, attach it to req
+    req.receiver = receiver;
 
     // check if send status is valid
     const allowedSendRequestStatus = ["like", "pass"];

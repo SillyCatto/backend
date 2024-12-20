@@ -24,8 +24,15 @@ requestRouter.post(
 
       const requestData = await connectionRequest.save();
 
+      let message;
+      if (status === "like") {
+        message = req.user.name + " likes " + req.receiver.name;
+      } else {
+        message = req.user.name + " ignored " + req.receiver.name;
+      }
+
       res.json({
-        message: "Request sent successfully",
+        message: message,
         data: requestData,
       });
     } catch (err) {
