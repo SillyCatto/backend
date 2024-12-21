@@ -5,7 +5,6 @@ const validateSendRequest = async (req, res, next) => {
   try {
     const senderID = req.user._id;
     const receiverID = req.params.receiverID;
-    const status = req.params.status;
 
     if (senderID.toString() === receiverID.toString())
       throw new Error("cannot send request to yourself");
@@ -18,6 +17,7 @@ const validateSendRequest = async (req, res, next) => {
     req.receiver = receiver;
 
     // check if send status is valid
+    const status = req.params.status;
     const allowedSendRequestStatus = ["like", "pass"];
     const isSendingRequestAllowed = allowedSendRequestStatus.includes(status);
     if (!isSendingRequestAllowed) throw new Error("Invalid request status");
@@ -39,6 +39,37 @@ const validateSendRequest = async (req, res, next) => {
   }
 };
 
+const validateReviewRequest = async (req, res, next) => {
+  try {
+    // check if incoming review status is valid
+    const status = req.params.status;
+    const allowedReviewRequestStatus = ["accepted", "rejected"];
+    const isRequestReviewAllowed = allowedReviewRequestStatus.includes(status);
+    if (!isRequestReviewAllowed) throw new Error("Invalid request status");
+
+    // check if a request exist such that-
+    // requestID exist,
+    // loggedInUser is the receiver
+    // and request status is "like"
+    const requestID = req.params.requestID;
+    const loggedInUser = req.user;
+    const request = await ConnectionRequest.findOne({
+      _id: requestID,
+      receiverID: loggedInUser._id,
+      status: "like",
+    });
+    if (!request) {
+      return res.status(404).json({ error: "request not found" });
+    }
+
+    req.pendingRequest = request;
+    next();
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
 module.exports = {
   validateSendRequest,
+  validateReviewRequest,
 };

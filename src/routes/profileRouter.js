@@ -31,13 +31,13 @@ profileRouter.patch(
   validateProfileEditInput,
   async (req, res) => {
     try {
-      const currentUser = req.user;
+      const loggedInUser = req.user;
 
       Object.keys(req.body).forEach(
-        (key) => (currentUser[key] = req.body[key]),
+        (key) => (loggedInUser[key] = req.body[key]),
       );
 
-      await currentUser.save();
+      await loggedInUser.save();
       res.json({ message: "Profile updated successfully" });
     } catch (err) {
       res.status(400).json({ error: err.message });
