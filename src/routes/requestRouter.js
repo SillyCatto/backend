@@ -63,22 +63,4 @@ requestRouter.post(
   },
 );
 
-requestRouter.get("/pending", authUserToken, async (req, res) => {
-  try {
-    const loggedInUser = req.user;
-    const data = await ConnectionRequest.find({
-      receiverID: loggedInUser._id,
-      status: "like",
-    });
-
-    if (data.length === 0) {
-      res.status(404).json({ message: "No requests pending" });
-    } else {
-      res.json({ data: data });
-    }
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
 module.exports = requestRouter;

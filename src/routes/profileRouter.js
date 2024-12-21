@@ -1,48 +1,28 @@
 const express = require("express");
 const { authUserToken } = require("../middlewares/authToken");
-const {
-  validateProfileEditInput,
-} = require("../middlewares/validateProfileInput");
+const User = require("../models/user");
 
 const profileRouter = express.Router();
 
-profileRouter.get("/view", authUserToken, async (req, res) => {
+profileRouter.get("/:userID", authUserToken, async (req, res) => {
   try {
-    const viewOwnProfileData = {
-      userID: req.user._id,
-      name: req.user.name,
-      email: req.user.email,
-      age: req.user.age,
-      gender: req.user.gender,
-      bio: req.user.bio,
-      photoURL: req.user.photoURL,
-      createdAt: req.user.createdAt,
-      updatedAt: req.user.updatedAt,
+    const user = await User.findById(req.params.userID);
+    if (!user) throw new Error("Invalid user ID");
+
+    const profileData = {
+      userID: user._id,
+      name: user.name,
+      age: user.age,
+      gender: user.gender,
+      bio: user.bio,
+      photoURL: user.photoURL,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     };
-    res.json({ profile: viewOwnProfileData });
+    res.json({ profile: profileData });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 });
-
-profileRouter.patch(
-  "/edit",
-  authUserToken,
-  validateProfileEditInput,
-  async (req, res) => {
-    try {
-      const loggedInUser = req.user;
-
-      Object.keys(req.body).forEach(
-        (key) => (loggedInUser[key] = req.body[key]),
-      );
-
-      await loggedInUser.save();
-      res.json({ message: "Profile updated successfully" });
-    } catch (err) {
-      res.status(400).json({ error: err.message });
-    }
-  },
-);
 
 module.exports = profileRouter;

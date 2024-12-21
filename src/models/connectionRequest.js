@@ -6,11 +6,13 @@ const connectionRequestSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       trim: true,
+      ref: "User",
     },
     receiverID: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       trim: true,
+      ref: "User",
     },
     status: {
       type: String,
