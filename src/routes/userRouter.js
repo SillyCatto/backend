@@ -1,6 +1,7 @@
 const express = require("express");
 const { authUserToken } = require("../middlewares/authToken");
 const ConnectionRequest = require("../models/connectionRequest");
+const User = require("../models/user");
 const {
   validateProfileEditInput,
 } = require("../middlewares/validateProfileInput");
@@ -78,7 +79,7 @@ userRouter.get("/connections", authUserToken, async (req, res) => {
       .populate("receiverID", ["name", "photoURL", "age", "gender", "bio"]);
 
     const connectedUsers = acceptedRequests.map((request) => {
-      if (request.senderID._id.equals(loggedInUser._id)) {
+      if (loggedInUser._id.equals(request.senderID._id)) {
         return request.receiverID;
       } else {
         return request.senderID;
@@ -97,6 +98,27 @@ userRouter.get("/connections", authUserToken, async (req, res) => {
 
 userRouter.get("/feed", authUserToken, async (req, res) => {
   try {
+    const loggedInUser = req.user;
+    const requestsOfLoggedInUser = await ConnectionRequest.find({
+      $or: [{ senderID: loggedInUser._id }, { receiverID: loggedInUser._id }],
+    }).select(["senderID", "receiverID"]);
+
+    const hideFromFeed = new Set();
+
+    requestsOfLoggedInUser.forEach((request) => {
+      hideFromFeed.add(request.receiverID.toString());
+      hideFromFeed.add(request.senderID.toString());
+    });
+
+    const feed = await User.find({
+      $and: [
+        { _id: { $ne: loggedInUser._id } },
+        { _id: { $nin: Array.from(hideFromFeed) } },
+      ],
+    }).select(["_id", "name", "age", "gender", "photoURL"]);
+
+    // do pagination
+    res.json({ data: feed });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
