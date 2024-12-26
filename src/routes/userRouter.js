@@ -99,6 +99,13 @@ userRouter.get("/connections", authUserToken, async (req, res) => {
 userRouter.get("/feed", authUserToken, async (req, res) => {
   try {
     const loggedInUser = req.user;
+
+    // pagination vars
+    const page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit) || 10;
+    limit = limit > 20 ? 20 : limit; // cap limit to a certain value to prevent huge db query
+    const skip = (page - 1) * limit;
+
     const requestsOfLoggedInUser = await ConnectionRequest.find({
       $or: [{ senderID: loggedInUser._id }, { receiverID: loggedInUser._id }],
     }).select(["senderID", "receiverID"]);
@@ -115,7 +122,10 @@ userRouter.get("/feed", authUserToken, async (req, res) => {
         { _id: { $ne: loggedInUser._id } },
         { _id: { $nin: Array.from(hideFromFeed) } },
       ],
-    }).select(["_id", "name", "age", "gender", "photoURL"]);
+    })
+      .select(["_id", "name", "age", "gender", "photoURL"])
+      .skip(skip)
+      .limit(limit);
 
     // do pagination
     res.json({ data: feed });
