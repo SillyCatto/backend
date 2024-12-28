@@ -26,7 +26,22 @@ authRouter.post("/login", validateLoginInput, authUser, async (req, res) => {
   try {
     const user = req.body.user;
     const token = await user.getJWT();
-    res.cookie("token", token).json({ message: "Login successful!" });
+
+    const profileData = {
+      userID: user._id,
+      name: user.name,
+      email: user.email,
+      age: user.age,
+      gender: user.gender,
+      bio: user.bio,
+      photoURL: user.photoURL,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+
+    res
+      .cookie("token", token)
+      .json({ message: "Login successful!", user: profileData });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
